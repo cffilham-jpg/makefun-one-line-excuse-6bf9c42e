@@ -39,6 +39,15 @@ def main() -> None:
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="") as f:
         f.write(LINE)
+    # Verify the write round-trips: what landed on disk must be
+    # byte-identical to LINE, or something is wrong with the write.
+    with open(path, "rb") as f:
+        written = f.read()
+    if written != LINE.encode("utf-8"):
+        raise RuntimeError(
+            f"entry.txt mismatch: wrote {len(LINE.encode('utf-8'))} bytes, "
+            f"read back {len(written)} bytes"
+        )
 
 
 if __name__ == "__main__":
